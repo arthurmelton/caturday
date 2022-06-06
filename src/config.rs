@@ -13,7 +13,8 @@ lazy_static! {
             let _ = set_cont(
                 "Config.json".to_string(),
                 "{\n\t\"Token\": \"(discord bot token)\",
-\t\"Application_id\": 123456789\n}"
+\t\"Application_id\": 123456789,\n
+\t\"Channel_id\": 123456789\n}"
                     .to_string(),
             );
             println!("You need to edit the Config.json");
