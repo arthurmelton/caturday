@@ -31,7 +31,6 @@ pub struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, ctx: Context, _ready: Ready) {
-        println!("online");
         loop {
             wait_till_next_saturday();
             let mut time = Utc::now();
@@ -58,13 +57,11 @@ impl EventHandler for Handler {
                 if item["is_video"].as_bool().unwrap()
                     && !item["media"]["reddit_video"]["is_gif"].as_bool().unwrap()
                 {
+                    let url = item["media"]["reddit_video"]["fallback_url"]
+                        .as_str()
+                        .unwrap();
                     if let Err(why) = ChannelId(CONFIG["Channel_id"].as_u64().unwrap())
-                        .say(
-                            &ctx.http,
-                            item["media"]["reddit_video"]["fallback_url"]
-                                .as_str()
-                                .unwrap(),
-                        )
+                        .say(&ctx.http, url[..url.len() - 16].to_string())
                         .await
                     {
                         println!("Error sending message: {:?}", why);
