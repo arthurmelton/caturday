@@ -1,6 +1,7 @@
+use std::fs::{self, File};
+
 use lazy_static::lazy_static;
 use serde_json::Value;
-use std::fs::{File, self};
 
 use crate::set_cont::set_cont;
 
