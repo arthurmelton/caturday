@@ -16,7 +16,9 @@ lazy_static! {
                 "{\n\t\"Token\": \"(discord bot token)\",
 \t\"Application_id\": 123456789,\n
 \t\"Channel_id\": 123456789,\n
-\t\"Per_day\": 25,\n}"
+\t\"Per_day\": 25,\n
+\t\"__comment__\": \"The uses can be 'reddit', 'cataas'\",\n
+\t\"Uses\": \"reddit\"\n}"
                     .to_string(),
             );
             println!("You need to edit the Config.json");

@@ -1,6 +1,7 @@
 use std::thread::sleep;
 
 use chrono::{Duration, Utc};
+use serde_json::Value;
 use serenity::{async_trait, model::gateway::Ready, prelude::*};
 use serenity::model::id::ChannelId;
 
@@ -36,36 +37,58 @@ impl EventHandler for Handler {
             let mut time = Utc::now();
             let data = get_reddit_value();
             for i in 0..CONFIG["Per_day"].as_u64().unwrap() as usize {
-                let item = &data.get(i).unwrap()["data"];
-                if let Err(why) = ChannelId(CONFIG["Channel_id"].as_u64().unwrap())
-                    .send_message(&ctx.http, |m| {
-                        m.embed(|e| {
-                            if !item["is_video"].as_bool().unwrap()
-                                || item["media"]["reddit_video"]["is_gif"].as_bool().unwrap()
+                match CONFIG["Uses"].as_str().unwrap() {
+                    "reddit" => {
+                        let item = &data.get(i).unwrap()["data"];
+                        if let Err(why) = ChannelId(CONFIG["Channel_id"].as_u64().unwrap())
+                            .send_message(&ctx.http, |m| {
+                                m.embed(|e| {
+                                    if !item["is_video"].as_bool().unwrap()
+                                        || item["media"]["reddit_video"]["is_gif"].as_bool().unwrap()
+                                    {
+                                        e.image(item["url"].as_str().unwrap());
+                                    }
+                                    e.title("Caturday");
+                                    e.colour(0xFFFFFF);
+                                    e
+                                })
+                            })
+                            .await
+                        {
+                            println!("Error sending message: {:?}", why);
+                        }
+                        if item["is_video"].as_bool().unwrap()
+                            && !item["media"]["reddit_video"]["is_gif"].as_bool().unwrap()
+                        {
+                            let url = item["media"]["reddit_video"]["fallback_url"]
+                                .as_str()
+                                .unwrap();
+                            if let Err(why) = ChannelId(CONFIG["Channel_id"].as_u64().unwrap())
+                                .say(&ctx.http, url[..url.len() - 16].to_string())
+                                .await
                             {
-                                e.image(item["url"].as_str().unwrap());
+                                println!("Error sending message: {:?}", why);
                             }
-                            e.title("Caturday");
-                            e.colour(0xFFFFFF);
-                            e
-                        })
-                    })
-                    .await
-                {
-                    println!("Error sending message: {:?}", why);
-                }
-                if item["is_video"].as_bool().unwrap()
-                    && !item["media"]["reddit_video"]["is_gif"].as_bool().unwrap()
-                {
-                    let url = item["media"]["reddit_video"]["fallback_url"]
-                        .as_str()
-                        .unwrap();
-                    if let Err(why) = ChannelId(CONFIG["Channel_id"].as_u64().unwrap())
-                        .say(&ctx.http, url[..url.len() - 16].to_string())
-                        .await
-                    {
-                        println!("Error sending message: {:?}", why);
-                    }
+                        }
+                    },
+                    "cataas" => {
+                        let data: Value = serde_json::from_str(ureq::get("https://cataas.com/cat?json=true")
+                            .call().unwrap().into_string().unwrap().as_str()).unwrap();
+                        if let Err(why) = ChannelId(CONFIG["Channel_id"].as_u64().unwrap())
+                            .send_message(&ctx.http, |m| {
+                                m.embed(|e| {
+                                    e.image(format!("https://cataas.com{}", data["url"].as_str().unwrap()));
+                                    e.title("Caturday");
+                                    e.colour(0xFFFFFF);
+                                    e
+                                })
+                            })
+                            .await
+                        {
+                            println!("Error sending message: {:?}", why);
+                        };
+                    },
+                    _ => {}
                 }
                 time = time
                     + Duration::milliseconds(
