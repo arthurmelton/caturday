@@ -1,6 +1,6 @@
 use std::thread::sleep;
 
-use chrono::{Datelike, DateTime, Duration, NaiveDate, Utc};
+use chrono::{DateTime, Datelike, Duration, NaiveDate, Utc};
 
 pub fn wait_till_next_saturday() {
     let time = Utc::now();

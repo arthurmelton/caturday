@@ -13,9 +13,9 @@ fn get_reddit_data() -> String {
                 "https://www.reddit.com/r/Kitten/top/.json?time=week&sort=top&limit={}",
                 CONFIG["Per_day"].as_u64().unwrap()
             )
-                .as_str(),
+            .as_str(),
         )
-            .call()
+        .call()
         {
             Ok(x) => x.into_string().unwrap(),
             Err(_) => "".to_string(),
