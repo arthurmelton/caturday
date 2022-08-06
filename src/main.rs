@@ -103,6 +103,7 @@ impl EventHandler for Handler {
                         }
                         _ => {}
                     }
+                    sleep(std::time::Duration::from_secs(5));
                     time = time
                         + Duration::milliseconds(
                             (86400000 / (CONFIG["Per_day"].as_u64().unwrap() - 1)) as i64,
