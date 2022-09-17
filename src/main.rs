@@ -35,9 +35,16 @@ impl EventHandler for Handler {
         tokio::task::spawn(async move {
             loop {
                 wait_till_next_saturday();
-                let mut time = Utc::now();
+                let start = Utc::now();
                 let data = get_reddit_value();
                 for i in 0..CONFIG["Per_day"].as_u64().unwrap() as usize {
+                    let time = start
+                        + Duration::milliseconds(
+                            (86400000 / (CONFIG["Per_day"].as_u64().unwrap() - 1)) as i64 * i,
+                        );
+                    sleep(std::time::Duration::from_millis(
+                        (time.timestamp_millis() - Utc::now().timestamp_millis()) as u64,
+                    ));
                     match CONFIG["Uses"].as_str().unwrap() {
                         "reddit" => {
                             let item = &data.get(i).unwrap()["data"];
@@ -103,14 +110,6 @@ impl EventHandler for Handler {
                         }
                         _ => {}
                     }
-                    sleep(std::time::Duration::from_secs(5));
-                    time = time
-                        + Duration::milliseconds(
-                            (86400000 / (CONFIG["Per_day"].as_u64().unwrap() - 1)) as i64,
-                        );
-                    sleep(std::time::Duration::from_millis(
-                        (time.timestamp_millis() - Utc::now().timestamp_millis()) as u64,
-                    ));
                 }
             }
         });
