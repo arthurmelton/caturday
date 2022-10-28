@@ -40,7 +40,7 @@ impl EventHandler for Handler {
                 for i in 0..CONFIG["Per_day"].as_u64().unwrap() as usize {
                     let time = start
                         + Duration::milliseconds(
-                            (86400000 / (CONFIG["Per_day"].as_u64().unwrap() - 1)) as i64 * i,
+                            (86400000 / (CONFIG["Per_day"].as_u64().unwrap() as i64 - 1)) * i as i64,
                         );
                     sleep(std::time::Duration::from_millis(
                         (time.timestamp_millis() - Utc::now().timestamp_millis()) as u64,
